@@ -1,11 +1,13 @@
-/*
--- 
-Creating the tables
+-- Creating the tables
+DROP TABLE IF EXISTS promotions;
+DROP TABLE IF EXISTS salaries;
+DROP TABLE IF EXISTS employees;
+DROP TABLE IF EXISTS departments;
+
 CREATE TABLE departments (
     department_id INT PRIMARY KEY,
     department_name VARCHAR(50)
 );
-
 CREATE TABLE employees (
     employee_id INT PRIMARY KEY,
     first_name VARCHAR(50),
@@ -63,15 +65,29 @@ INSERT INTO promotions (promotion_id, employee_id, promotion_date, old_title, ne
 (1, 101, '2019-12-01', 'HR Assistant', 'HR Coordinator'),
 (2, 102, '2017-06-15', 'Junior Developer', 'Software Engineer'),
 (3, 104, '2019-05-01', 'Junior Accountant', 'Accountant'),
-(4, 106, '2021-03-10', 'HR Assistant', 'HR Specialist');
-*/
+(4, 106, '2021-03-10', 'HR Assistant', 'HR Specialist');
 --Analysing the DATABASE
 --Let's start with the Average salary per department
 SELECT d.department_name, ROUND(AVG(s.salary), 2) AS average_salary
 FROM employees e
 JOIN departments d ON e.department_id = d.department_id
 JOIN salaries s ON e.employee_id = s.employee_id
-GROUP BY 
-    d.department_name
-ORDER BY 
-    average_salary DESC;
+GROUP BY d.department_name
+ORDER BY average_salary DESC;
+--Checking promotion based on date.
+SELECT 
+    e.employee_id,
+    e.first_name || ' ' || e.last_name AS full_name,
+    p.promotion_date,
+    p.old_title,
+    p.new_title
+FROM promotions p
+JOIN employees e ON p.employee_id = e.employee_id
+ORDER BY p.promotion_date ASC;
+
+--How long employees have been with the company
+SELECT 
+    e.first_name || ' ' || e.last_name AS full_name,
+    ROUND((julianday('now') - julianday(e.hire_date)) / 365, 1) AS years_of_service
+FROM employees e
+ORDER BY years_of_service DESC;
